@@ -1,0 +1,10 @@
+---
+import type { Image } from '../data/types';
+
+interface Props {
+  image: Image;
+}
+
+const { image: i } = Astro.props;
+---
+<img src={i.src} srcset={i.srcset} sizes={i.sizes} alt={i.alt} width={i.width} height={i.height} loading={i.loading} fetchpriority={i.fetchpriority} decoding={i.decoding}>

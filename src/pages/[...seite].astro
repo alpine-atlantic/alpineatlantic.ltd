@@ -1,0 +1,17 @@
+---
+/** Baut jede Datei aus src/data/seiten/ als eigene Unterseite (Adresse = path in der Datei). */
+import type { GetStaticPaths } from 'astro';
+import type { SubPage as SubPageData } from '../data/types';
+import SubPage from '../components/SubPage.astro';
+
+export const getStaticPaths = (() => {
+  const dateien = import.meta.glob<{ default: SubPageData }>('../data/seiten/*.ts', { eager: true });
+  return Object.values(dateien).map(({ default: seite }) => ({
+    params: { seite: seite.path.replace(/^\//, '') },
+    props: { seite },
+  }));
+}) satisfies GetStaticPaths;
+
+const { seite } = Astro.props;
+---
+<SubPage seite={seite} />

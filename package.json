@@ -1,0 +1,22 @@
+{
+  "name": "alpine-atlantic",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "deploy:vorschau": "astro build && npx --yes wrangler pages deploy dist --project-name=alpine-atlantic --branch=astro-vorschau --commit-dirty=true",
+    "deploy": "astro build && npx --yes wrangler pages deploy dist --project-name=alpine-atlantic --branch=main --commit-dirty=true"
+  },
+  "dependencies": {
+    "@astrojs/markdown-satteri": "^0.4.6",
+    "astro": "^7.4.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "typescript": "^6.0.3"
+  }
+}

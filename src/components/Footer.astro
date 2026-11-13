@@ -1,0 +1,83 @@
+---
+import { site, ui, footer } from '../data/site';
+import { allServices } from '../data/services';
+import { branches } from '../data/branches';
+import { homeHref, whatsappHref, mailHref, telHref, nbsp } from '../lib/links';
+import Icon from './Icon.astro';
+
+interface Props {
+  onHome?: boolean;
+  /**
+   * Pfad der aktuellen Seite, danach die übergeordneten Seiten. Der erste davon, der in der Fußzeile
+   * vorkommt, bekommt aria-current="page" (z. B. markiert /sps-fehlersuche die Rubrik SPS-Programmierung).
+   */
+  current?: string[];
+  /** Vorbelegter Text für den schwebenden WhatsApp-Knopf. */
+  waText?: string;
+  /** Beschriftung des schwebenden WhatsApp-Knopfs. */
+  waLabel?: string;
+  /** Schwebenden WhatsApp-Knopf zeigen (auf Rechtstexten aus). */
+  waFloat?: boolean;
+}
+
+const {
+  onHome = false,
+  current = [],
+  waText = site.whatsapp.defaultText,
+  waLabel = ui.waFloat,
+  waFloat = true,
+} = Astro.props;
+const href = (h: string) => homeHref(h, onHome);
+const serviceLinks = allServices.filter((s) => s.page && s.footerLabel);
+const footerHrefs = [...serviceLinks.map((s) => s.page), ...branches.map((b) => b.href), ...footer.legal.map((l) => l.href)];
+const aktiv = current.find((p) => footerHrefs.includes(p));
+const cur = (h: string) => (h === aktiv ? 'page' : undefined);
+---
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="wordmark">{site.brand}</span>
+        <p>{ui.footerBrandText}</p>
+        <ul class="footer-contact">
+          <li><Icon name="calendar" /><a href={site.terminPage}>{footer.calendlyLabel}</a></li>
+          <li><Icon name="mail" /><a href={mailHref()}>{site.email}</a></li>
+          <li><Icon name="phone" /><a href={telHref}>{nbsp(site.phone.display)}</a></li>
+          <li><Icon name="message-chat" /><a href={whatsappHref()} target="_blank" rel="noopener">{nbsp(`${ui.whatsappFooter} ${site.whatsapp.display}`)}</a></li>
+        </ul>
+      </div>
+      <nav class="footer-nav" aria-label={ui.footerNav}>
+        <div class="footer-col">
+          <span class="mono">{footer.headings.services}</span>
+          {serviceLinks.map((s) => <a href={s.page} aria-current={cur(s.page!)}>{s.footerLabel}</a>)}
+        </div>
+        <div class="footer-col">
+          <span class="mono">{footer.headings.branches}</span>
+          {branches.map((b) => <a href={b.href} aria-current={cur(b.href)}>{b.title}</a>)}
+        </div>
+        <div class="footer-col">
+          <span class="mono">{footer.headings.company}</span>
+          {footer.company.map((l) =>
+            l.external
+              ? <a href={l.href} target="_blank" rel="noopener">{l.label}<Icon name="arrow-ext" /></a>
+              : <a href={href(l.href)}>{l.label}</a>
+          )}
+        </div>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-meta">
+        <span>© {site.year} {site.name}</span>
+        <span><Icon name="marker-pin" />{footer.location}</span>
+        <span><Icon name="globe" />{footer.area}</span>
+      </div>
+      <div class="footer-legal">
+        {footer.legal.map((l) => <a href={l.href} aria-current={cur(l.href)}>{l.label}</a>)}
+        <a href="#" class="footer-top-link">{footer.toTop}<Icon name="arrow-up" /></a>
+      </div>
+    </div>
+    <svg class="footer-mark" viewBox="0 0 1000 124" aria-hidden="true" focusable="false"><text x="0" y="112" textLength="1000" lengthAdjust="spacingAndGlyphs">{site.brand}</text></svg>
+  </div>
+</footer>
+
+{waFloat && <a class="wa-float" href={whatsappHref(waText)} target="_blank" rel="noopener" aria-label={ui.waAria}><span class="dot" aria-hidden="true"></span>{waLabel}</a>}

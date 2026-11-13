@@ -1,0 +1,14 @@
+---
+/**
+ * Unsichtbares SVG-Sprite am Anfang von <body>; Icon.astro verweist per <use href="#i-…"> darauf.
+ * Als Text eingesetzt, weil Astros Typen das Attribut hidden an <svg> nicht kennen –
+ * style.css blendet es über svg[hidden] aus.
+ */
+import { icons } from '../lib/icons';
+
+const symbols = Object.entries(icons)
+  .map(([name, d]) => `<symbol id="i-${name}" viewBox="0 0 24 24"><path d="${d}"/></symbol>`)
+  .join('');
+const sprite = `<svg hidden aria-hidden="true" xmlns="http://www.w3.org/2000/svg">${symbols}</svg>`;
+---
+<Fragment set:html={sprite} />

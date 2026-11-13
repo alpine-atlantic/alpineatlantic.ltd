@@ -1,0 +1,17 @@
+---
+import { branches } from '../data/branches';
+import Section from './Section.astro';
+import Icon from './Icon.astro';
+---
+<Section id="branchen">
+  <div class="branch-grid">
+    {branches.map((b) => (
+      <a class="branch" href={b.href}>
+        <span class="mono">{b.tag}</span>
+        <span class="entry-title">{b.title}</span>
+        <span class="entry-text">{b.text}</span>
+        <span class="entry-more">{b.more}<Icon name="arrow-right" class="ico-go" /></span>
+      </a>
+    ))}
+  </div>
+</Section>

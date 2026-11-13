@@ -1,0 +1,66 @@
+---
+/** Terminbuchung im eigenen Design: Calendly wird erst nach Klick auf „Kalender laden“ eingebettet. */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import { site, ui } from '../data/site';
+import { termin as t } from '../data/termin';
+import { telHref, whatsappHref, nbsp } from '../lib/links';
+---
+<BaseLayout title={t.title} description={t.description} canonical="/termin" waText={t.waText}>
+  <section class="container subhero" aria-labelledby="hero-title">
+    <nav class="pathline mono" aria-label={ui.sub.pathAria}><a href="/">{t.pathline.home}</a><span aria-hidden="true">/</span><span>{t.pathline.current}</span></nav>
+    <h1 id="hero-title" class="h1-wide">{t.hero.title}</h1>
+    <div class="subhero-row">
+      <p class="lead">{t.hero.lead}</p>
+    </div>
+    <div class="rule-ink"></div>
+  </section>
+
+  <section class="container termin-layout" aria-labelledby="termin-title">
+    <aside class="termin-info">
+      <ul class="checks">
+        {t.facts.map((f) => <li><Icon name="check" />{f}</li>)}
+      </ul>
+      <div class="termin-alt">
+        <h2 class="termin-alt-title">{t.alternativesTitle}</h2>
+        <p>{t.alternativesText}</p>
+        <ul class="footer-contact termin-contact">
+          <li><Icon name="phone" /><a href={telHref}>{nbsp(site.phone.display)}</a></li>
+          <li><Icon name="message-chat" /><a href={whatsappHref(t.waText)} target="_blank" rel="noopener">{ui.whatsappFooter} {site.whatsapp.display}</a></li>
+          <li><Icon name="edit" /><a href={t.formLink.href}>{t.formLink.label}</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="termin-box" id="termin">
+      <div class="termin-consent">
+        <span class="faq-hint-icon"><Icon name="calendar" /></span>
+        <h2 id="termin-title">{t.consent.title}</h2>
+        <p>{t.consent.text}</p>
+        <p><a href={t.consent.privacy.href}>{t.consent.privacy.label}</a></p>
+        <button type="button" class="btn" id="termin-laden"><Icon name="calendar" />{t.consent.button}</button>
+        <a class="textlink" href={t.consent.fallback.href} target="_blank" rel="noopener">{t.consent.fallback.label}<Icon name="arrow-ext" /></a>
+      </div>
+      <div class="calendly-inline-widget" data-url={t.embedUrl} hidden></div>
+    </div>
+  </section>
+
+  <script is:inline>
+    // Zwei-Klick-Lösung: Calendly erst nach Zustimmung laden.
+    (function () {
+      var box = document.getElementById('termin');
+      var knopf = document.getElementById('termin-laden');
+      if (!box || !knopf) return;
+      var hinweis = box.querySelector('.termin-consent');
+      var kalender = box.querySelector('.calendly-inline-widget');
+      knopf.addEventListener('click', function () {
+        hinweis.hidden = true;
+        kalender.hidden = false;
+        var s = document.createElement('script');
+        s.src = 'https://assets.calendly.com/assets/external/widget.js';
+        s.async = true;
+        document.head.appendChild(s);
+      });
+    })();
+  </script>
+</BaseLayout>

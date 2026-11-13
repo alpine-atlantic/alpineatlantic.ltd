@@ -1,0 +1,25 @@
+---
+/** Ein Inhaltsblock einer Unterseite: Überschrift und Bausteine (Absatz, Liste, Bild …). */
+import type { Block } from '../data/types';
+import Img from './Img.astro';
+import RichText from './RichText.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  block: Block;
+}
+
+const { block: b } = Astro.props;
+---
+<div id={b.id} class="block">
+  {b.title && <h2>{b.title}</h2>}
+  {b.content.map((n) =>
+    n.type === 'p' ? <p><RichText value={n.text} /></p>
+    : n.type === 'h3' ? <h3>{n.text}</h3>
+    : n.type === 'checks' ? <ul class="checks">{n.items.map((i) => <li><Icon name="check" /><RichText value={i} /></li>)}</ul>
+    : n.type === 'ablauf' ? <ol class="ablauf">{n.items.map((i) => <li><span><RichText value={i} /></span></li>)}</ol>
+    : n.type === 'related' ? <ul class="related">{n.links.map((l) => <li><a class="textlink" href={l.href}>{l.label}<Icon name="arrow-right" class="ico-go" /></a></li>)}</ul>
+    : <figure><Img image={n.image} /><figcaption class="mono">{n.caption}</figcaption></figure>
+  )}
+  <slot />
+</div>

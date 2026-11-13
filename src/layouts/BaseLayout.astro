@@ -1,0 +1,113 @@
+---
+/**
+ * Grundgerüst jeder Seite: <head> mit Meta-, Open-Graph- und Schema.org-Angaben, SVG-Sprite,
+ * Kopf- und Fußzeile. Unterseiten setzen title, description und canonical; der Rest hat Standardwerte.
+ */
+import { site } from '../data/site';
+import type { FaqItem } from '../data/faq';
+import { absUrl } from '../lib/links';
+import { organisation, founder, website, webPage, faqPage, graphJson } from '../lib/schema';
+import IconSprite from '../components/IconSprite.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Pfad der Seite, z. B. "/serverwartung" – wird zur absoluten Canonical-Adresse. */
+  canonical?: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  /** Startseite: Anker ohne / und Wortmarke springt zum Seitenanfang. */
+  onHome?: boolean;
+  /** FAQ-Einträge, die zusätzlich als FAQPage ins Markup gehen. */
+  faq?: FaqItem[];
+  /** Weitere Schema.org-Knoten der Seite (z. B. Service, BreadcrumbList). */
+  schema?: Record<string, unknown>[];
+  /** Vorbelegter Text des schwebenden WhatsApp-Knopfs. */
+  waText?: string;
+  /** Beschriftung des schwebenden WhatsApp-Knopfs (Standard „WhatsApp“). */
+  waLabel?: string;
+  /** Schwebenden WhatsApp-Knopf zeigen (Standard: ja). */
+  waFloat?: boolean;
+  /** Übergeordnete Seiten – für die Markierung der Rubrik in der Fußzeile. */
+  parents?: string[];
+  /** Seite nicht indexieren (Impressum, Datenschutz, 404) – dann ohne Canonical. */
+  noindex?: boolean;
+  /** CSS-Klasse für <main>, z. B. "legal" für Rechtstexte. */
+  mainClass?: string;
+}
+
+const {
+  title = site.meta.title,
+  description = site.meta.description,
+  canonical = Astro.url.pathname.replace(/\.html$/, '').replace(/\/index$/, '/'),
+  ogImage = site.meta.ogImage,
+  ogImageAlt = site.meta.ogImageAlt,
+  onHome = false,
+  faq,
+  schema = [],
+  waText,
+  waLabel,
+  waFloat = true,
+  parents = [],
+  noindex = false,
+  mainClass,
+} = Astro.props;
+
+const url = absUrl(canonical);
+const image = absUrl(ogImage);
+const graph = graphJson([organisation(), founder(), website(), webPage(url, title, description), ...(faq ? [faqPage(faq, url)] : []), ...schema]);
+const v = site.assetVersion;
+---
+<!DOCTYPE html>
+<html lang={site.lang}>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <meta name="robots" content={noindex ? 'noindex, follow' : site.meta.robots}>
+  {!noindex && <link rel="canonical" href={url}>}
+  <meta name="author" content={site.meta.author}>
+  <meta name="copyright" content={site.meta.copyright}>
+  <meta name="facebook-domain-verification" content={site.facebookDomainVerification}>
+  <meta name="theme-color" content={site.themeColor}>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content={site.name}>
+  <meta property="og:title" content={title}>
+  <meta property="og:description" content={description}>
+  <meta property="og:url" content={url}>
+  <meta property="og:image" content={image}>
+  <meta property="og:image:alt" content={ogImageAlt}>
+  <meta property="og:image:width" content={String(site.meta.ogImageWidth)}>
+  <meta property="og:image:height" content={String(site.meta.ogImageHeight)}>
+  <meta property="og:locale" content={site.locale}>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content={title}>
+  <meta name="twitter:description" content={description}>
+  <meta name="twitter:image" content={image}>
+  <script type="application/ld+json" is:inline set:html={graph} />
+  <link rel="icon" href={`/assets/icon-48.png?v=${v.icons}`} sizes="48x48" type="image/png">
+  <link rel="icon" href={`/assets/logo.svg?v=${v.icons}`} type="image/svg+xml">
+  <link rel="apple-touch-icon" href={`/assets/icon-180.png?v=${v.icons}`}>
+  <link rel="manifest" href="/site.webmanifest">
+  <link rel="preload" href="/assets/fonts/archivo-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/jetbrains-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href={`/css/fonts.css?v=${v.fonts}`}>
+  <link rel="stylesheet" href={`/css/style.css?v=${v.style}`}>
+</head>
+<body>
+<!--email_off-->
+<IconSprite />
+
+<Header onHome={onHome} current={[canonical, ...parents]} />
+
+<main id={onHome ? 'start' : undefined} class={mainClass}>
+  <slot />
+</main>
+
+<Footer onHome={onHome} current={[canonical, ...parents]} waText={waText} waLabel={waLabel} waFloat={waFloat} />
+<!--/email_off-->
+</body>
+</html>

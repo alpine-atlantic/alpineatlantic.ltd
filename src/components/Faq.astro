@@ -1,0 +1,22 @@
+---
+import { site, ui } from '../data/site';
+import { faq, faqHint } from '../data/faq';
+import { whatsappHref } from '../lib/links';
+import Section from './Section.astro';
+import FaqList from './FaqList.astro';
+import Icon from './Icon.astro';
+---
+<Section id="faq">
+  <div class="faq-layout">
+    <aside class="faq-hint" aria-labelledby="faq-hint-title">
+      <span class="faq-hint-icon"><Icon name="message-question" /></span>
+      <h3 id="faq-hint-title">{faqHint.title}</h3>
+      <p>{faqHint.text}</p>
+      <div class="faq-hint-actions">
+        <a href={site.terminPage} class="btn"><Icon name="calendar" />{ui.headerCta.long}</a>
+        <a href={whatsappHref(site.whatsapp.defaultText)} target="_blank" rel="noopener" class="btn btn-outline"><Icon name="message-chat" />{ui.whatsappFooter}</a>
+      </div>
+    </aside>
+    <FaqList items={faq} />
+  </div>
+</Section>

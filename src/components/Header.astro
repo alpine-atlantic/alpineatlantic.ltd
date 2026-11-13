@@ -1,0 +1,119 @@
+---
+/**
+ * Kopfzeile: Infoleiste (nur Desktop), Logo + Wortmarke, Navigation mit Ausklappmenüs für Leistungen und Branchen,
+ * Termin-Knopf und Handy-Menü (<details> – funktioniert auch ohne JavaScript).
+ */
+import { site, ui, nav, header, serviceMenu } from '../data/site';
+import { branches } from '../data/branches';
+import { homeHref, telHref, mailHref, whatsappHref, nbsp } from '../lib/links';
+import Icon from './Icon.astro';
+
+interface Props {
+  /** Auf der Startseite zeigen Anker direkt auf die Abschnitte, sonst auf /#…. */
+  onHome?: boolean;
+  /** Aktueller Pfad und übergeordnete Seiten – markiert die passende Rubrik. */
+  current?: string[];
+}
+
+const { onHome = false, current = [] } = Astro.props;
+const href = (h: string) => homeHref(h, onHome);
+const serviceHrefs = serviceMenu.flatMap((g) => g.links.map((l) => l.href));
+const branchHrefs = branches.map((b) => b.href);
+const aktiv = (art?: 'services' | 'branches') =>
+  art && current.some((p) => (art === 'services' ? serviceHrefs : branchHrefs).includes(p)) ? 'is-active' : undefined;
+const einfacheLinks = nav.filter((n) => !n.dropdown);
+---
+<div class="topbar">
+  <div class="container topbar-inner">
+    <div class="topbar-links">
+      <a href={mailHref()}><Icon name="mail" />{site.email}</a>
+      <span><Icon name="clock" />{header.topbar.available}</span>
+    </div>
+    <div class="topbar-links">
+      <a href={telHref}><Icon name="phone" />{nbsp(site.phone.display)}</a>
+      <a href={whatsappHref()} target="_blank" rel="noopener"><Icon name="message-chat" />{ui.whatsappFooter}</a>
+      <a href={header.topbar.check.href} class="topbar-check">{header.topbar.check.label}<Icon name="arrow-right" class="ico-go" /></a>
+    </div>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    {onHome
+      ? <a href="#start" class="wordmark" aria-label={`${site.brand} – ${ui.wordmarkTop}`}><img src={`/assets/logo.svg?v=${site.assetVersion.icons}`} alt="" width="28" height="28" class="wordmark-logo">{site.brand}</a>
+      : <a href="/" class="wordmark" aria-label={`${site.brand} – ${ui.wordmarkHome}`}><img src={`/assets/logo.svg?v=${site.assetVersion.icons}`} alt="" width="28" height="28" class="wordmark-logo">{site.brand}</a>}
+
+    <nav class="nav" aria-label={ui.mainNav}>
+      {nav.map((item) =>
+        item.dropdown === 'services' ? (
+          <div class="nav-drop">
+            <a href={href(item.href)} aria-haspopup="true" class={aktiv('services')}>{item.label}<Icon name="chevron-down" class="ico-chevron" /></a>
+            <div class="nav-menu nav-menu-wide">
+              {serviceMenu.map((g) => (
+                <div class="nav-group">
+                  <span class="mono">{g.title}</span>
+                  {g.links.map((l) => <a href={l.href}><span class="nav-label">{l.label}</span><span class="nav-hint">{l.hint}</span></a>)}
+                </div>
+              ))}
+              <a class="nav-all" href={href(header.menuAllServices.href)}>{header.menuAllServices.label}<Icon name="arrow-right" class="ico-go" /></a>
+            </div>
+          </div>
+        ) : item.dropdown === 'branches' ? (
+          <div class="nav-drop">
+            <a href={href(item.href)} aria-haspopup="true" class={aktiv('branches')}>{item.label}<Icon name="chevron-down" class="ico-chevron" /></a>
+            <div class="nav-menu">
+              {branches.map((b) => <a href={b.href}><span class="nav-label">{b.title}</span><span class="nav-hint">{b.tag}</span></a>)}
+            </div>
+          </div>
+        ) : (
+          <a href={href(item.href)}>{item.label}</a>
+        )
+      )}
+    </nav>
+
+    <div class="header-actions">
+      <a href={site.terminPage} class="btn btn-header"><Icon name="calendar" /><span class="lbl-long">{ui.headerCta.long}</span><span class="lbl-short">{ui.headerCta.short}</span></a>
+      <details class="mnav">
+        <summary class="mnav-toggle"><Icon name="menu" class="ico-menu" /><Icon name="x-close" class="ico-close" /><span class="sr-only">{header.menuOpen}</span></summary>
+        <div class="mnav-panel">
+          <div class="mnav-group">
+            <span class="mono">{header.menuGroups.services}</span>
+            {serviceMenu.flatMap((g) => g.links).map((l) => <a href={l.href}>{l.label}</a>)}
+          </div>
+          <div class="mnav-group">
+            <span class="mono">{header.menuGroups.branches}</span>
+            {branches.map((b) => <a href={b.href}>{b.title}</a>)}
+          </div>
+          <div class="mnav-group">
+            <span class="mono">{header.menuGroups.company}</span>
+            {einfacheLinks.map((l) => <a href={href(l.href)}>{l.label}</a>)}
+          </div>
+          <div class="mnav-contact">
+            <a href={site.terminPage} class="btn"><Icon name="calendar" />{ui.headerCta.long}</a>
+            <a href={telHref} class="btn btn-outline"><Icon name="phone" />{header.call}</a>
+            <a href={whatsappHref()} target="_blank" rel="noopener" class="btn btn-outline"><Icon name="message-chat" />{ui.whatsappFooter}</a>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</header>
+
+<script is:inline>
+  // Kopfzeile: Schatten beim Scrollen; Handy-Menü schließt bei Link-Klick, Escape und Wechsel auf Desktop-Breite.
+  (function () {
+    var kopf = document.querySelector('.site-header');
+    var menue = document.querySelector('.mnav');
+    if (!kopf) return;
+    var schatten = function () { kopf.classList.toggle('is-scrolled', window.scrollY > 8); };
+    schatten();
+    window.addEventListener('scroll', schatten, { passive: true });
+    if (!menue) return;
+    menue.addEventListener('toggle', function () { document.documentElement.classList.toggle('mnav-offen', menue.open); });
+    menue.querySelectorAll('a').forEach(function (a) { a.addEventListener('click', function () { menue.open = false; }); });
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && menue.open) { menue.open = false; menue.querySelector('summary').focus(); }
+    });
+    window.addEventListener('resize', function () { if (window.innerWidth >= 900 && menue.open) menue.open = false; });
+  })();
+</script>

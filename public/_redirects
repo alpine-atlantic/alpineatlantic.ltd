@@ -1,0 +1,12 @@
+# Geratene bzw. frühere Adressen dauerhaft auf die richtigen Seiten leiten
+/externer-sps-programmierer  /sps-programmierer       301
+/sps-programmierer-extern    /sps-programmierer       301
+/engineering-automotive      /automotive-software     301
+/automotive                  /automotive-software     301
+/seo                         /webentwicklung#seo      301
+/seo-geo-backlinks           /webentwicklung#seo      301
+/webdesign                   /webentwicklung          301
+/kontakt                     /#kontakt                301
+/leistungen                  /#leistungen             301
+/branchen                    /#branchen               301
+/erstgespraech               /termin                  301

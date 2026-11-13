@@ -1,0 +1,37 @@
+---
+import { hero } from '../data/hero';
+import Img from './Img.astro';
+import Icon from './Icon.astro';
+---
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container">
+    <div class="hero-grid">
+      <div class="hero-text">
+        <p class="mono">{hero.kicker}</p>
+        <h1 id="hero-title">{hero.title}</h1>
+        <p class="lead">{hero.lead}</p>
+        <div class="hero-actions">
+          <a href={hero.cta.href} class="btn"><Icon name="calendar" />{hero.cta.label}</a>
+          {hero.links.map((l) => <a href={l.href} class="textlink">{l.label}</a>)}
+        </div>
+      </div>
+      <figure class="hero-figure">
+        <div class="hero-photo"><Img image={hero.portrait} /></div>
+        <figcaption class="mono">{hero.caption}</figcaption>
+      </figure>
+    </div>
+    <div class="entry-grid" role="group" aria-label={hero.entriesLabel}>
+      {hero.entries.map((e) => (
+        <a class="entry" href={e.href}>
+          <span class="mono">{e.tag}</span>
+          <span class="entry-title">{e.title}</span>
+          <span class="entry-text">{e.text}</span>
+          <span class="entry-more">{e.more}<Icon name="arrow-right" class="ico-go" /></span>
+        </a>
+      ))}
+    </div>
+    <ul class="promises">
+      {hero.promises.map((p) => <li><span class="mono"><Icon name={p.icon} />{p.title}</span><span>{p.text}</span></li>)}
+    </ul>
+  </div>
+</section>

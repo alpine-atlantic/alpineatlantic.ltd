@@ -1,0 +1,18 @@
+---
+import { about } from '../data/about';
+import Section from './Section.astro';
+import Img from './Img.astro';
+import Icon from './Icon.astro';
+---
+<Section id="ueber-uns">
+  <div class="about">
+    <figure class="about-figure">
+      <Img image={about.image} />
+      <figcaption class="mono">{about.caption}</figcaption>
+    </figure>
+    <div class="about-text">
+      {about.paragraphs.map((t, i) => (i === about.quote ? <blockquote class="about-quote"><p>{t}</p></blockquote> : <p class="text">{t}</p>))}
+      <a href={about.link.href} class="textlink" target="_blank" rel="noopener">{about.link.label}<Icon name="arrow-ext" /></a>
+    </div>
+  </div>
+</Section>

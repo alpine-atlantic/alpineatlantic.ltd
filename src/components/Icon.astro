@@ -1,0 +1,12 @@
+---
+/** Symbol aus dem SVG-Sprite (IconSprite.astro). */
+import type { IconName } from '../lib/icons';
+
+interface Props {
+  name: IconName;
+  class?: string;
+}
+
+const { name, class: extra } = Astro.props;
+---
+<svg class={extra ? `ico ${extra}` : 'ico'} aria-hidden="true"><use href={`#i-${name}`}/></svg>

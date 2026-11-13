@@ -1,0 +1,40 @@
+---
+import { focusService as f, services } from '../data/services';
+import { pad } from '../lib/links';
+import Section from './Section.astro';
+import Img from './Img.astro';
+import RichText from './RichText.astro';
+import Icon from './Icon.astro';
+---
+<Section id="leistungen">
+  <div class="sps-block">
+    <div class="sps-media">
+      <Img image={f.image} />
+    </div>
+    <div class="sps-text">
+      <span class="mono">{pad(1)} · {f.tag}</span>
+      <h3>{f.title}</h3>
+      <p class="text"><RichText value={f.text} /></p>
+      <ul class="bullets">
+        {f.bullets.map((b) => <li>{b}</li>)}
+      </ul>
+      <ul class="related">
+        {f.related.map((l) => <li><a href={l.href} class="textlink">{l.label}<Icon name="arrow-right" class="ico-go" /></a></li>)}
+      </ul>
+      <a href={f.more.href} class="textlink">{f.more.label}<Icon name="arrow-right" class="ico-go" /></a>
+    </div>
+  </div>
+
+  <div class="service-rows">
+    {services.map((s, i) => (
+      <div class="service-row">
+        <span class="service-num">{s.icon && <span class="service-icon"><Icon name={s.icon} /></span>}{pad(i + 2)}</span>
+        <div class="service-text">
+          <h3>{s.page ? <a href={s.page}>{s.title}</a> : s.title}</h3>
+          <p><RichText value={s.text} /></p>
+        </div>
+        <a href={s.cta.href} class="textlink" aria-label={s.cta.ariaLabel}>{s.cta.label}<Icon name="arrow-right" class="ico-go" /></a>
+      </div>
+    ))}
+  </div>
+</Section>

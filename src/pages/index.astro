@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import Services from '../components/Services.astro';
+import Branches from '../components/Branches.astro';
+import FitCheck from '../components/FitCheck.astro';
+import ProcessSteps from '../components/ProcessSteps.astro';
+import Projects from '../components/Projects.astro';
+import About from '../components/About.astro';
+import Faq from '../components/Faq.astro';
+import ContactSection from '../components/ContactSection.astro';
+import { faq } from '../data/faq';
+---
+<BaseLayout canonical="/" onHome faq={faq}>
+  <Hero />
+  <Services />
+  <Branches />
+  <FitCheck />
+  <ProcessSteps />
+  <Projects />
+  <About />
+  <Faq />
+  <ContactSection />
+</BaseLayout>

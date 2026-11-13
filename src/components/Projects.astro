@@ -1,0 +1,31 @@
+---
+import { projects, projectLabel, factLabels } from '../data/projects';
+import { pad } from '../lib/links';
+import Section from './Section.astro';
+import Img from './Img.astro';
+import Icon from './Icon.astro';
+import RichText from './RichText.astro';
+import Testimonials from './Testimonials.astro';
+---
+<Section id="projekte">
+  <div class="projects">
+    {projects.map((p, i) => (
+      <article class="project">
+        <div class="project-media">
+          <Img image={p.image} />
+        </div>
+        <div class="project-text">
+          <span class="mono">{projectLabel} {pad(i + 1)}</span>
+          <h3>{p.title}</h3>
+          <p class="text"><RichText value={p.text} /></p>
+          <dl class="facts">
+            <dt>{factLabels.branche}</dt><dd>{p.branche}</dd>
+            <dt>{factLabels.leistung}</dt><dd>{p.leistung}</dd>
+            <dt>{factLabels.website}</dt><dd><a href={p.website.href} target="_blank" rel="noopener">{p.website.label}<Icon name="arrow-ext" /></a></dd>
+          </dl>
+        </div>
+      </article>
+    ))}
+  </div>
+  <Testimonials />
+</Section>

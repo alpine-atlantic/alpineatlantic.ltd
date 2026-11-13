@@ -1,0 +1,13 @@
+---
+/** Layout der Markdown-Seiten (Impressum, Datenschutz, AGB, 404): Fließtext in <main class="legal">. */
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  frontmatter: { title: string; description: string; noindex?: boolean };
+}
+
+const { frontmatter: fm } = Astro.props;
+---
+<BaseLayout title={fm.title} description={fm.description} noindex={fm.noindex} mainClass="legal" waFloat={false}>
+  <slot />
+</BaseLayout>

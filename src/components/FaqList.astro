@@ -1,0 +1,20 @@
+---
+/** Aufklappbare Fragen und Antworten (Startseite und Unterseiten). */
+import type { FaqItem } from '../data/faq';
+import Icon from './Icon.astro';
+
+interface Props {
+  items: FaqItem[];
+  class?: string;
+}
+
+const { items, class: cls = 'faq' } = Astro.props;
+---
+<div class={cls}>
+  {items.map((f) => (
+    <details>
+      <summary><span>{f.q}</span><Icon name="plus" class="ico-plus" /><Icon name="minus" class="ico-minus" /></summary>
+      <p>{f.a}</p>
+    </details>
+  ))}
+</div>

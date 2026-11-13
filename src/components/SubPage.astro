@@ -1,0 +1,94 @@
+---
+/**
+ * Vorlage der Leistungs- und Branchenseiten: Kopf mit Pfad und Terminbuchung, Inhaltsverzeichnis mit Eckdaten,
+ * Inhaltsblöcke, Häufige Fragen und Abschlusskasten. Inhalte kommen aus src/data/seiten/*.ts.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContentBlock from './ContentBlock.astro';
+import FaqList from './FaqList.astro';
+import RichText from './RichText.astro';
+import Icon from './Icon.astro';
+import type { SubPage } from '../data/types';
+import { site, ui } from '../data/site';
+import { breadcrumbList, service } from '../lib/schema';
+import { whatsappHref, mailHref } from '../lib/links';
+
+interface Props {
+  seite: SubPage;
+}
+
+const { seite: s } = Astro.props;
+const t = ui.sub;
+
+const toc = [
+  ...s.blocks
+    .filter((b) => b.id && b.title && b.toc !== false)
+    .map((b) => ({ href: `#${b.id}`, label: typeof b.toc === 'string' ? b.toc : b.title! })),
+  ...(s.faqInToc ? [{ href: '#faq', label: t.faqTitle }] : []),
+];
+
+const schema = [
+  breadcrumbList([...(s.breadcrumb ?? []), { name: s.breadcrumbName, href: s.path }]),
+  ...(s.service ? [service(s.service, s.path)] : []),
+];
+---
+<BaseLayout
+  title={s.title}
+  description={s.description}
+  canonical={s.path}
+  faq={s.faq}
+  schema={schema}
+  waText={s.waText}
+  waLabel={s.waLabel}
+  parents={s.pathline.links.map((l) => l.href).reverse()}
+>
+  <section class="container subhero" aria-labelledby="hero-title">
+    <nav class="pathline mono" aria-label={t.pathAria}>{s.pathline.links.map((l) => <Fragment><a href={l.href}>{l.label}</a><span aria-hidden="true">/</span></Fragment>)}<span>{s.pathline.current}</span></nav>
+    <h1 id="hero-title" class="h1-wide">{s.hero.title}</h1>
+    <div class="subhero-row">
+      <p class="lead"><RichText value={s.hero.lead} /></p>
+      {s.heroCta
+        ? <a href={s.heroCta.href} class="btn"><Icon name="edit" />{s.heroCta.label}</a>
+        : <a href={site.terminPage} class="btn"><Icon name="calendar" />{t.heroCta}</a>}
+    </div>
+    <div class="rule-ink"></div>
+  </section>
+
+  <section class="container sublayout" aria-label={s.layoutLabel}>
+    <aside class="subnav">
+      <nav aria-label={t.tocTitle}>
+        <span class="mono">{t.tocTitle}</span>
+        {toc.map((l) => <a href={l.href}>{l.label}</a>)}
+      </nav>
+      <dl class="subfacts">
+        {s.facts.map((f) => <div><dt class="mono">{f.label}</dt><dd><RichText value={f.value} /></dd></div>)}
+      </dl>
+    </aside>
+
+    <div class="subbody">
+      {s.blocks.map((b) => <ContentBlock block={b} />)}
+      <ContentBlock block={{ id: 'faq', title: t.faqTitle, content: [] }}>
+        <FaqList items={s.faq} class="faq faq-sub" />
+      </ContentBlock>
+    </div>
+  </section>
+
+  <section class="container cta" aria-labelledby="cta-title">
+    <div class="cta-box">
+      <div class="cta-text">
+        <span class="mono">{t.ctaTag}</span>
+        <h2 id="cta-title">{s.cta.title}</h2>
+        <p><RichText value={s.cta.text} /></p>
+      </div>
+      <div class="cta-actions">
+        <a href={site.terminPage} class="btn"><Icon name="calendar" />{t.ctaMain}</a>
+        <div class="cta-grid">
+          <a href="/#kontakt" class="btn btn-outline"><Icon name="edit" />{t.ctaForm}</a>
+          <a href={mailHref(s.cta.mailSubject)} class="btn btn-outline"><Icon name="mail" />{t.ctaMail}</a>
+          <a href={whatsappHref(s.waText)} class="btn btn-outline" target="_blank" rel="noopener"><Icon name="message-chat" />{t.ctaWhatsapp}</a>
+        </div>
+        <span class="cta-note">{site.email} · {t.phoneShort} {site.phone.display} · {t.ctaWhatsapp} {site.whatsapp.display}</span>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

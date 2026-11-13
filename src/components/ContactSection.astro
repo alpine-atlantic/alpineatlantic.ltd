@@ -1,0 +1,124 @@
+---
+import { site } from '../data/site';
+import { contact as c } from '../data/contact';
+import { whatsappHref, mailHref, telHref, nbsp } from '../lib/links';
+import Section from './Section.astro';
+import RichText from './RichText.astro';
+import Icon from './Icon.astro';
+import type { Field } from '../data/contact';
+
+const input = (f: Field) => ({
+  type: f.type,
+  name: f.name,
+  required: f.required,
+  autocomplete: f.autocomplete,
+  inputmode: f.inputmode,
+  placeholder: f.placeholder,
+});
+---
+<Section id="kontakt">
+  <div class="contact-grid">
+    <form class="contact-form" id="kontaktformular" method="post" action="/api/kontakt" novalidate>
+      <p class="mono">{c.requiredHint}</p>
+      <div class="form-grid">
+        {c.gridFields.map((f) => <label class="field"><span>{f.label}</span><input {...input(f)}></label>)}
+      </div>
+      {c.fullFields.map((f) =>
+        f.rows
+          ? <label class="field"><span>{f.label}</span><textarea name={f.name} required={f.required} rows={f.rows} placeholder={f.placeholder}></textarea></label>
+          : <label class="field"><span>{f.label}</span><input {...input(f)}></label>
+      )}
+      <p class="consent"><RichText value={c.consent} /></p>
+      <div class="hp" aria-hidden="true"><label>{c.honeypot.label}<input type="text" name={c.honeypot.name} tabindex="-1" autocomplete="off"></label></div>
+      <div class="form-actions">
+        <button type="submit" class="btn form-submit">{c.submit}</button>
+        <p class="form-status" role="status" aria-live="polite"></p>
+      </div>
+    </form>
+    <aside class="direct" aria-label={c.directLabel}>
+      <div class="direct-item">
+        <span class="mono"><Icon name="calendar" />{c.calendly.tag}</span>
+        <a href={site.terminPage}>{c.calendly.label}</a>
+        <span class="hint">{c.calendly.hint}</span>
+      </div>
+      <div class="direct-item">
+        <span class="mono"><Icon name="mail" />{c.email.tag}</span>
+        <a href={mailHref(c.email.subject)}>{site.email}</a>
+      </div>
+      <div class="direct-item">
+        <span class="mono"><Icon name="phone" />{c.phone.tag}</span>
+        <a href={telHref}>{nbsp(site.phone.display)}</a>
+      </div>
+      <div class="direct-item">
+        <span class="mono"><Icon name="message-chat" />{c.whatsapp.tag}</span>
+        <a href={whatsappHref(site.whatsapp.defaultText)} target="_blank" rel="noopener">{site.whatsapp.display}</a>
+        <span class="hint">{c.whatsapp.hint}</span>
+      </div>
+      <div class="direct-item rule">
+        <span class="mono"><Icon name="user" />{c.person.tag}</span>
+        <span class="name">{c.person.name}</span>
+      </div>
+    </aside>
+  </div>
+</Section>
+
+<script define:vars={{ MAIL: site.email, MSG: c.messages }}>
+  // Kontaktformular: Versand per Fetch an die Pages Function; ohne JavaScript geht der normale POST.
+  const form = document.getElementById('kontaktformular');
+  if (form) {
+    const status = form.querySelector('.form-status');
+    const submit = form.querySelector('.form-submit');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      status.className = 'form-status';
+      status.textContent = '';
+
+      for (const [feld, text] of MSG.required) {
+        const el = form.elements[feld];
+        if (!el.value.trim()) {
+          el.setAttribute('aria-invalid', 'true');
+          el.focus();
+          status.className = 'form-status err';
+          status.textContent = text;
+          return;
+        }
+        el.removeAttribute('aria-invalid');
+      }
+      const mail = form.elements.email;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail.value.trim())) {
+        mail.setAttribute('aria-invalid', 'true');
+        mail.focus();
+        status.className = 'form-status err';
+        status.textContent = MSG.invalidEmail;
+        return;
+      }
+
+      const daten = Object.fromEntries(new FormData(form).entries());
+      submit.disabled = true;
+      submit.setAttribute('aria-busy', 'true');
+      const label = submit.textContent;
+      submit.textContent = MSG.sending;
+
+      try {
+        const res = await fetch('/api/kontakt', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(daten)
+        });
+        if (!res.ok) throw new Error('Status ' + res.status);
+        form.reset();
+        status.className = 'form-status ok';
+        status.textContent = MSG.success;
+      } catch (err) {
+        status.className = 'form-status err';
+        status.setAttribute('role', 'alert');
+        status.innerHTML = MSG.error + ' <a href="mailto:' + MAIL + '">' + MAIL + '</a>.';
+      } finally {
+        submit.disabled = false;
+        submit.removeAttribute('aria-busy');
+        submit.textContent = label;
+      }
+    });
+  }
+</script>

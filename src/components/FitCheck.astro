@@ -1,0 +1,22 @@
+---
+import { fit } from '../data/fit';
+import Section from './Section.astro';
+import Icon from './Icon.astro';
+
+const columns = [
+  { cls: 'fit fit-ja', icon: 'check' as const, ...fit.yes },
+  { cls: 'fit fit-nein', icon: 'x-close' as const, ...fit.no },
+];
+---
+<Section id="passt">
+  <div class="fit-grid">
+    {columns.map((c) => (
+      <div class={c.cls}>
+        <h3>{c.title}</h3>
+        <ul>
+          {c.items.map((item) => <li><Icon name={c.icon} />{item}</li>)}
+        </ul>
+      </div>
+    ))}
+  </div>
+</Section>

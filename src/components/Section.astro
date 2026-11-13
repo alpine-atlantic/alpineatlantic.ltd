@@ -1,0 +1,22 @@
+---
+/** Rahmen eines Startseiten-Abschnitts mit Kopfzeile „Label · 01 / 08“ und Überschrift. */
+import { sections, type SectionId, type SectionMeta } from '../data/sections';
+import { pad } from '../lib/links';
+
+interface Props {
+  id: SectionId;
+}
+
+const index = sections.findIndex((s) => s.id === Astro.props.id);
+const s: SectionMeta = sections[index];
+---
+<section id={s.id} class={s.className ? `section ${s.className}` : 'section'} aria-labelledby={s.titleId}>
+  <div class="container section-inner">
+    <div class="section-head">
+      <div class="section-label mono"><span>{s.label}</span><span>{pad(index + 1)} / {pad(sections.length)}</span></div>
+      <h2 id={s.titleId}>{s.title}</h2>
+      {s.lead && <p class="lead">{s.lead}</p>}
+    </div>
+    <slot />
+  </div>
+</section>

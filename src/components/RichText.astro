@@ -1,0 +1,17 @@
+---
+/** Gibt Fließtext mit Links und Hervorhebungen aus (siehe Rich in data/types.ts). */
+import type { Rich } from '../data/types';
+
+interface Props {
+  value: Rich;
+}
+
+const { value } = Astro.props;
+const parts = typeof value === 'string' ? [value] : value;
+---
+{parts.map((p) =>
+  typeof p === 'string' ? p
+  : p.href && p.external ? <a href={p.href} target="_blank" rel="noopener">{p.text}</a>
+  : p.href ? <a href={p.href}>{p.text}</a>
+  : <strong>{p.text}</strong>
+)}

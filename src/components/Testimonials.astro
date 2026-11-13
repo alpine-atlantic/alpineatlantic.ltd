@@ -1,0 +1,18 @@
+---
+/** Kundenstimmen unter den Projekten – wird nur gerendert, wenn Zitate vorhanden sind. */
+import { testimonials } from '../data/testimonials';
+import Icon from './Icon.astro';
+---
+{testimonials.length > 0 && (
+  <div class="testimonials">
+    {testimonials.map((t) => (
+      <figure class="testimonial">
+        <blockquote><p>{t.quote}</p></blockquote>
+        <figcaption>
+          <span class="testimonial-name">{t.name}</span>
+          <span class="mono">{t.role}{t.href && <a href={t.href} target="_blank" rel="noopener"><Icon name="arrow-ext" /></a>}</span>
+        </figcaption>
+      </figure>
+    ))}
+  </div>
+)}

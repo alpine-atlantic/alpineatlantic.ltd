@@ -1,0 +1,10 @@
+---
+import { steps, stepLabel } from '../data/steps';
+import { pad } from '../lib/links';
+import Section from './Section.astro';
+---
+<Section id="ablauf">
+  <ol class="steps">
+    {steps.map((s, i) => <li><span class="mono">{stepLabel} {pad(i + 1)}</span><h3>{s.title}</h3><p>{s.text}</p></li>)}
+  </ol>
+</Section>
