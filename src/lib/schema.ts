@@ -37,7 +37,7 @@ export function organisation(): Node {
       availableLanguage: ['German', 'English'],
       hoursAvailable: { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], opens: '00:00', closes: '23:59' },
     },
-    sameAs: [site.linkedin],
+    sameAs: [site.linkedin, site.github],
     openingHours: site.schema.openingHours,
     priceRange: site.schema.priceRange,
     knowsLanguage: [...site.schema.knowsLanguage],

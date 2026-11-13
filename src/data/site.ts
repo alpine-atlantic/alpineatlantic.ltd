@@ -24,6 +24,8 @@ export const site = {
   /** Eigene Buchungsseite mit eingebettetem Kalender – alle Termin-Knöpfe zeigen hierhin */
   terminPage: '/termin',
   linkedin: 'https://www.linkedin.com/in/ambrosius-schmidt-6b72b43a4/',
+  /** Organisation auf GitHub (Profilseite + Quellcode dieser Website) */
+  github: 'https://github.com/alpine-atlantic',
 
   founder: { name: 'Ambrosius Schmidt', jobTitle: 'Managing Director', roleDe: 'Geschäftsführer' },
   address: {
@@ -150,6 +152,7 @@ export const footer = {
     { label: 'Häufige Fragen', href: '#faq' },
     { label: 'Kontaktformular', href: '#kontakt' },
     { label: 'LinkedIn', href: site.linkedin, external: true },
+    { label: 'GitHub', href: site.github, external: true },
   ] as Link[],
   /** Kontaktwege unter der Markenbeschreibung */
   calendlyLabel: 'Erstgespräch buchen',
